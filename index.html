@@ -3,30 +3,184 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rickera12 Apps</title>
+  <title>BS Tools</title>
+  <meta name="description" content="BS Tools – приложения за Android: Rebalancer, Работен Календар, CarServiceBook.">
+  <link rel="icon" type="image/png" href="img/favicon.png">
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
-    li { margin-bottom: 12px; }
+    :root {
+      --bg: #04070b;
+      --card: rgba(14, 22, 32, 0.72);
+      --card-border: rgba(120, 170, 255, 0.14);
+      --text: #e8eef6;
+      --muted: #94a3b8;
+      --green: #3ee06b;
+      --blue: #1e90ff;
+      --cyan: #22c7ff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.55;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Neon diagonal streaks, same motif as the app icons and splash screens */
+    .streaks { position: fixed; pointer-events: none; z-index: 0; width: 42vmin; height: 42vmin; min-width: 180px; min-height: 180px; filter: drop-shadow(0 0 6px currentColor); }
+    .streaks.tl {
+      top: 0; left: 0; color: var(--green);
+      background: linear-gradient(135deg,
+        transparent 14%, var(--green) 14.6%, var(--green) 15.8%, transparent 16.4%,
+        transparent 22%, rgba(62,224,107,.7) 22.4%, rgba(62,224,107,.7) 23.2%, transparent 23.6%,
+        transparent 29%, rgba(62,224,107,.4) 29.3%, rgba(62,224,107,.4) 29.8%, transparent 30.1%,
+        transparent 36%, rgba(30,144,255,.35) 36.3%, rgba(30,144,255,.35) 36.7%, transparent 37%);
+      -webkit-mask-image: linear-gradient(135deg, #000 20%, transparent 50%);
+              mask-image: linear-gradient(135deg, #000 20%, transparent 50%);
+    }
+    .streaks.br {
+      bottom: 0; right: 0; color: var(--blue);
+      background: linear-gradient(315deg,
+        transparent 14%, var(--blue) 14.6%, var(--blue) 15.8%, transparent 16.4%,
+        transparent 22%, rgba(34,199,255,.7) 22.4%, rgba(34,199,255,.7) 23.2%, transparent 23.6%,
+        transparent 29%, rgba(30,144,255,.4) 29.3%, rgba(30,144,255,.4) 29.8%, transparent 30.1%,
+        transparent 36%, rgba(62,224,107,.35) 36.3%, rgba(62,224,107,.35) 36.7%, transparent 37%);
+      -webkit-mask-image: linear-gradient(315deg, #000 20%, transparent 50%);
+              mask-image: linear-gradient(315deg, #000 20%, transparent 50%);
+    }
+    .glow {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(60vmax 40vmax at 0% 0%, rgba(62, 224, 107, .10), transparent 60%),
+        radial-gradient(60vmax 40vmax at 100% 100%, rgba(30, 144, 255, .14), transparent 60%);
+    }
+
+    main { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 48px 16px 32px; }
+
+    header { text-align: center; margin-bottom: 40px; }
+    .logo {
+      width: min(360px, 80vw);
+      height: auto;
+      display: block;
+      margin: 0 auto 12px;
+      -webkit-mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+              mask-image: radial-gradient(closest-side, #000 72%, transparent 100%);
+    }
+    header p { color: var(--muted); margin: 0; font-size: 1.05rem; }
+    header p .en { display: block; font-size: .9rem; opacity: .8; }
+
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .app {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+    .app:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 199, 255, .45);
+      box-shadow: 0 10px 40px rgba(30, 144, 255, .18), 0 0 0 1px rgba(62, 224, 107, .15) inset;
+    }
+    .app img.icon {
+      width: 96px; height: 96px;
+      border-radius: 22px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .55), 0 0 24px rgba(34, 199, 255, .18);
+      margin-bottom: 16px;
+    }
+    .app h2 { margin: 0 0 6px; font-size: 1.3rem; }
+    .app p { margin: 0 0 4px; color: var(--muted); font-size: .95rem; }
+    .app p.en { font-size: .85rem; opacity: .75; margin-bottom: 20px; }
+    .links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: .92rem;
+      text-decoration: none;
+      color: #04130a;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      box-shadow: 0 0 18px rgba(34, 199, 255, .25);
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
+    .link { color: var(--cyan); font-size: .88rem; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+    a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+    footer { position: relative; z-index: 1; text-align: center; color: var(--muted); font-size: .85rem; padding: 24px 16px 40px; }
+
+    @media (prefers-reduced-motion: reduce) { .app { transition: none; } .app:hover { transform: none; } }
   </style>
 </head>
 <body>
-  <h1>Приложения за Android</h1>
-  <ul>
-    <li>
-      <strong>Rebalancer</strong> – калкулатор за разпределение и ребалансиране на портфейл<br>
-      <a href="https://play.google.com/store/apps/details?id=bg.rebalancer.app">Google Play</a> ·
-      <a href="https://sites.google.com/view/rebalancer/home">Политика за поверителност</a>
-    </li>
-    <li>
-      <strong>Работен Календар</strong><br>
-      <a href="https://play.google.com/store/apps/details?id=bg.bstools.workcalendar">Google Play</a> ·
-      <a href="https://sites.google.com/view/bdtools/home">Политика за поверителност</a>
-    </li>
-     <li>
-      <strong>CarServiceBook</strong><br>
-      <a href="https://play.google.com/store/apps/details?id=bg.carservicebook.app">Google Play</a> ·
-      <a href="https://sites.google.com/view/carservicebookprivacypolicy/home">Политика за поверителност</a>
-    </li>
-  </ul>
+  <div class="glow" aria-hidden="true"></div>
+  <div class="streaks tl" aria-hidden="true"></div>
+  <div class="streaks br" aria-hidden="true"></div>
+
+  <main>
+    <header>
+      <img class="logo" src="img/logo.jpg" alt="BS Tools" width="740" height="600">
+      <p>Приложения за Android<span class="en">Android apps</span></p>
+    </header>
+
+    <section class="apps">
+      <article class="app">
+        <img class="icon" src="img/rebalancer.png" alt="" width="96" height="96">
+        <h2>Rebalancer</h2>
+        <p>Проследяване на портфейл и изчисляване на разпределение и ребалансиране.</p>
+        <p class="en">Portfolio tracker and allocation / rebalancing calculator.</p>
+        <div class="links">
+          <a class="btn" href="https://play.google.com/store/apps/details?id=bg.rebalancer.app">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.5 8.1 2.9-2.8L6.6 1.3l8.9 9.3zm0 2.8-8.9 9.3 11.8-6.5-2.9-2.8zm6-1.4-2.6-1.4-3 2.9 3 2.9 2.6-1.4c.7-.4.7-1.6 0-2z"/></svg>
+            Google Play
+          </a>
+          <a class="link" href="https://sites.google.com/view/rebalancer/home">Поверителност</a>
+        </div>
+      </article>
+
+      <article class="app">
+        <img class="icon" src="img/workcalendar.png" alt="" width="96" height="96">
+        <h2>Работен Календар</h2>
+        <p>Календар на смените, отработени часове и напомняния.</p>
+        <p class="en">Work shift calendar, worked hours and alarms.</p>
+        <div class="links">
+          <a class="btn" href="https://play.google.com/store/apps/details?id=bg.bstools.workcalendar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.5 8.1 2.9-2.8L6.6 1.3l8.9 9.3zm0 2.8-8.9 9.3 11.8-6.5-2.9-2.8zm6-1.4-2.6-1.4-3 2.9 3 2.9 2.6-1.4c.7-.4.7-1.6 0-2z"/></svg>
+            Google Play
+          </a>
+          <a class="link" href="https://sites.google.com/view/bdtools/home">Поверителност</a>
+        </div>
+      </article>
+
+      <article class="app">
+        <img class="icon" src="img/carservicebook.png" alt="" width="96" height="96">
+        <h2>CarServiceBook</h2>
+        <p>Сервизна книжка: документи, ремонти, гориво, разходи и напомняния.</p>
+        <p class="en">Car service book: documents, service history, fuel, costs and reminders.</p>
+        <div class="links">
+          <a class="btn" href="https://play.google.com/store/apps/details?id=bg.carservicebook.app">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.5v19l10-9.5L4 2.5zm11.5 8.1 2.9-2.8L6.6 1.3l8.9 9.3zm0 2.8-8.9 9.3 11.8-6.5-2.9-2.8zm6-1.4-2.6-1.4-3 2.9 3 2.9 2.6-1.4c.7-.4.7-1.6 0-2z"/></svg>
+            Google Play
+          </a>
+          <a class="link" href="https://sites.google.com/view/carservicebookprivacypolicy/home">Поверителност</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>© 2026 BS Tools</footer>
 </body>
 </html>
